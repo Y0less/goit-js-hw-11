@@ -10,9 +10,14 @@ refs.searchForm.addEventListener('submit', handleSubmit);
 function handleSubmit(evt) {
   evt.preventDefault();
   const searchQuery = evt.currentTarget.elements.searchQuery.value;
-  console.log('searchQuery :>> ', searchQuery);
+  console.log('searchQuery :>> ', searchQuery); //hide
   getImages(searchQuery)
-    .then(data => (console.log(data), generateMarkup(data)))
+    .then(
+      data => (
+        console.log(data), //hide
+        generateMarkup(data)
+      )
+    )
     .catch(error => console.log(error));
 }
 
@@ -30,19 +35,21 @@ function generateMarkup(data = []) {
           downloads,
         } = data.hits
       ) => `<div class="photo-card">
+        <div class="img-container"> 
   <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+        </div>
   <div class="info">
     <p class="info-item">
-      <b>Likes</b>
+      <b>Likes</b><br>${likes}
     </p>
     <p class="info-item">
-      <b>Views</b>
+      <b>Views </b><br>${views}
     </p>
     <p class="info-item">
-      <b>Comments</b>
+      <b>Comments </b><br>${likes}
     </p>
     <p class="info-item">
-      <b>Downloads</b>
+      <b>Downloads </b><br>${likes}
     </p>
   </div>
 </div>`
@@ -50,3 +57,6 @@ function generateMarkup(data = []) {
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
 }
+
+//temporary
+getImages('dogs').then(data => generateMarkup(data));
