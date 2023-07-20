@@ -1,0 +1,25 @@
+body {
+    background-color: #fcfcfc;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 40px;
+    background-color: #0352fc
+}
+
+.search-form input {
+    border-radius: 5px;
+    min-height: 30px;
+    min-width: 250px;
+    border-color: transparent
+}
+
+.search-form button {
+    border-radius: 5px;
+    min-height: 30px;
+    min-width: fit-content;
+    border-color: transparent;
+}
