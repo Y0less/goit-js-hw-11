@@ -35,7 +35,7 @@ function handleSubmit(evt) {
 }
 
 function generateMarkup(data = []) {
-  markup = data.hits
+  const markup = data.hits
     .map(
       (
         {
