@@ -13,13 +13,14 @@ const searchParams = {
   image_type: 'photo',
   orientation: 'horizontal',
   safesearch: 'true',
+  per_page: '40',
 };
 
-export default async function getImages(searchQuery) {
-  const { key, image_type, orientation, safesearch } = searchParams;
+export default async function getImages(searchQuery, page) {
+  const { key, image_type, orientation, safesearch, per_page } = searchParams;
   try {
     const response = await axiosInstance.get(
-      `?key=${key}&q=${searchQuery}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}`
+      `?key=${key}&q=${searchQuery}&page=${page}&per_page=${per_page}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}`
     );
     // console.log(response);
     return response.data;

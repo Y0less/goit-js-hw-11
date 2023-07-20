@@ -1,3 +1,7 @@
+:root {
+    --main-color: #0352fc
+}
+
 body {
     background-color: #fcfcfc;
 }
@@ -7,14 +11,15 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 50px;
-    background-color: #0352fc
+    background-color: var(--main-color)
 }
 
 .search-form input {
     border-radius: 5px;
-    min-height: 30px;
+    min-height: 35px;
     min-width: 250px;
-    border-color: transparent
+    border-color: transparent;
+    line-height: 1.5;
 }
 
 .search-form button {
@@ -74,4 +79,22 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
+}
+
+.load-more {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 5px;
+    min-height: 30px;
+    text-transform: uppercase;
+    min-width: fit-content;
+    color: wheat;
+    background-color: var(--main-color)
+        /* border-color: transparent; */
+
+}
+
+.is-hidden {
+    display: none;
 }
