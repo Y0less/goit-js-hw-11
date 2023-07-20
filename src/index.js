@@ -35,9 +35,7 @@ function generateMarkup(data = []) {
           downloads,
         } = data.hits
       ) => `<div class="photo-card">
-        <div class="img-container"> 
   <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-        </div>
   <div class="info">
     <p class="info-item">
       <b>Likes</b><br>${likes}
@@ -59,4 +57,4 @@ function generateMarkup(data = []) {
 }
 
 //temporary
-getImages('dogs').then(data => generateMarkup(data));
+getImages('cat').then(data => generateMarkup(data));
