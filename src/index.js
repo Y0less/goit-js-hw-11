@@ -7,31 +7,60 @@ const refs = {
   loadMore: document.querySelector('.load-more'),
 };
 
-let page = 1;
+let page = null;
+let searchQuery = '';
+let totalHits = null;
 
 refs.searchForm.addEventListener('submit', handleSubmit);
+refs.loadMore.addEventListener('click', handleLoadmore);
 
 function handleSubmit(evt) {
   evt.preventDefault();
   refs.gallery.innerHTML = '';
-  if (!refs.loadMore.classList.contains('is-hidden')) {
-    toggleLoadMore();
-  }
-  const searchQuery = evt.currentTarget.elements.searchQuery.value;
+  searchQuery = '';
+  page = 1;
+  hideLoadMore();
+  searchQuery = evt.currentTarget.elements.searchQuery.value;
   console.log('searchQuery :>> ', searchQuery); //hide
+
+  getImages(searchQuery, page)
+    .then(data => {
+      totalHits = data.totalHits;
+      if (!totalHits) {
+        notifyFailure();
+        hideLoadMore();
+        return;
+      }
+      console.log(data); //hide
+      notifySuccess(totalHits);
+      generateMarkup(data);
+      showLoadMore();
+    })
+    .catch(error => {
+      console.log(error);
+      hideLoadMore();
+    })
+    .finally();
+}
+
+function handleLoadmore() {
+  page += 1;
   getImages(searchQuery, page)
     .then(data => {
       if (!data.totalHits) {
         notifyFailure();
-        toggleLoadMore();
+        hideLoadMore();
+        return;
       }
-      console.log(data), //hide
-        generateMarkup(data);
-      //   toggleLoadMore();
+      console.log(data); //hide
+      generateMarkup(data);
+      showLoadMore();
     })
-    .catch(error => console.log(error))
-    .finally(toggleLoadMore);
-  //   page += 1;
+    .catch(error => {
+      console.log(error);
+      hideLoadMore();
+    })
+    .finally();
 }
 
 function generateMarkup(data = []) {
@@ -64,8 +93,11 @@ function generateMarkup(data = []) {
   refs.gallery.insertAdjacentHTML('beforeend', markup);
 }
 
-function toggleLoadMore() {
-  refs.loadMore.classList.toggle('is-hidden');
+function showLoadMore() {
+  refs.loadMore.classList.remove('is-hidden');
+}
+function hideLoadMore() {
+  refs.loadMore.classList.add('is-hidden');
 }
 
 function notifyFailure() {
@@ -74,5 +106,11 @@ function notifyFailure() {
   );
 }
 
+function notifySuccess(matches) {
+  Notify.success(`${matches} matches found!`);
+}
+
 //temporary
 // getImages('cat').then(data => generateMarkup(data));
+
+// showLoadMore();
