@@ -18,7 +18,7 @@ function handleSubmit(evt) {
   evt.preventDefault();
   refs.gallery.innerHTML = '';
   searchQuery = '';
-  page = 1;
+  page = 11;
   hideLoadMore();
   searchQuery = evt.currentTarget.elements.searchQuery.value;
   console.log('searchQuery :>> ', searchQuery); //hide
@@ -55,8 +55,10 @@ function handleLoadmore() {
         return;
       }
       console.log(data); //hide
+      console.log('page :>> ', page); //hide
       generateMarkup(data);
       showLoadMore();
+      checkCollectionEnd(data);
     })
     .catch(error => {
       console.log(error);
@@ -103,7 +105,7 @@ function hideLoadMore() {
 }
 
 function checkCollectionEnd(data) {
-  if (data.hits.length * page <= data.totalHits) {
+  if (data.hits.length < 40) {
     console.log('End of Collection'); //hide
     hideLoadMore();
     Notify.warning('You have reached the End of your search query collection');
