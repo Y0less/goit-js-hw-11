@@ -32,9 +32,11 @@ function handleSubmit(evt) {
         return;
       }
       console.log(data); //hide
+      console.log('data.hits.length :>> ', data.hits.length); //hide
       notifySuccess(totalHits);
       generateMarkup(data);
       showLoadMore();
+      checkCollectionEnd(data);
     })
     .catch(error => {
       console.log(error);
@@ -98,6 +100,14 @@ function showLoadMore() {
 }
 function hideLoadMore() {
   refs.loadMore.classList.add('is-hidden');
+}
+
+function checkCollectionEnd(data) {
+  if (data.hits.length * page <= data.totalHits) {
+    console.log('End of Collection'); //hide
+    hideLoadMore();
+    Notify.warning('You have reached the End of your search query collection');
+  }
 }
 
 function notifyFailure() {
