@@ -1,5 +1,14 @@
 import getImages from './pixabay-api';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+export const searchParams = {
+  image_type: 'photo',
+  orientation: 'horizontal',
+  safesearch: 'true',
+  per_page: '',
+  page: '',
+};
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -7,7 +16,21 @@ const refs = {
   loadMore: document.querySelector('.load-more'),
 };
 
-let page = null;
+// const { height: cardHeight } =
+//   refs.gallery.firstElementChild.getBoundingClientRect();
+
+// window.scrollBy({
+//   top: cardHeight * 2,
+//   behavior: 'smooth',
+// });
+
+const lightbox = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+  overlayOpacity: 0.6,
+});
+
+const perPage = 40;
 let searchQuery = '';
 let totalHits = null;
 
@@ -18,12 +41,13 @@ function handleSubmit(evt) {
   evt.preventDefault();
   refs.gallery.innerHTML = '';
   searchQuery = '';
-  page = 11;
+  searchParams.per_page = perPage;
+  searchParams.page = 1;
   hideLoadMore();
   searchQuery = evt.currentTarget.elements.searchQuery.value;
   console.log('searchQuery :>> ', searchQuery); //hide
 
-  getImages(searchQuery, page)
+  getImages(searchQuery)
     .then(data => {
       totalHits = data.totalHits;
       if (!totalHits) {
@@ -37,6 +61,7 @@ function handleSubmit(evt) {
       generateMarkup(data);
       showLoadMore();
       checkCollectionEnd(data);
+      lightbox.refresh();
     })
     .catch(error => {
       console.log(error);
@@ -46,8 +71,8 @@ function handleSubmit(evt) {
 }
 
 function handleLoadmore() {
-  page += 1;
-  getImages(searchQuery, page)
+  searchParams.page += 1;
+  getImages(searchQuery)
     .then(data => {
       if (!data.totalHits) {
         notifyFailure();
@@ -55,10 +80,12 @@ function handleLoadmore() {
         return;
       }
       console.log(data); //hide
-      console.log('page :>> ', page); //hide
+      console.log('page :>> ', searchParams.page); //hide
       generateMarkup(data);
       showLoadMore();
       checkCollectionEnd(data);
+      lightbox.refresh();
+      autoScrollUp();
     })
     .catch(error => {
       console.log(error);
@@ -82,15 +109,18 @@ function generateMarkup(data = []) {
         } = data.hits
       ) =>
         `
-<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-  <div class="info">
-    <p class="info-item"><b>Likes</b><br />${likes}</p>
-    <p class="info-item"><b>Views </b><br />${views}</p>
-    <p class="info-item"><b>Comments </b><br />${comments}</p>
-    <p class="info-item"><b>Downloads </b><br />${downloads}</p>
+
+  <div class="photo-card">
+  <a class="gallery-link" href="${largeImageURL}">
+    <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+    </a>
+    <div class="info">
+      <p class="info-item"><b>Likes</b><br />${likes}</p>
+      <p class="info-item"><b>Views </b><br />${views}</p>
+      <p class="info-item"><b>Comments </b><br />${comments}</p>
+      <p class="info-item"><b>Downloads </b><br />${downloads}</p>
+    </div>
   </div>
-</div>
 `
     )
     .join('');
@@ -105,11 +135,22 @@ function hideLoadMore() {
 }
 
 function checkCollectionEnd(data) {
-  if (data.hits.length < 40) {
-    console.log('End of Collection'); //hide
+  if (data.totalHits <= perPage * searchParams.page) {
+    Notify.warning(
+      "We're sorry, but you've reached the end of search results."
+    );
     hideLoadMore();
-    Notify.warning('You have reached the End of your search query collection');
   }
+}
+
+function autoScrollUp() {
+  const { height: cardHeight } =
+    refs.gallery.firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
 
 function notifyFailure() {
@@ -119,10 +160,5 @@ function notifyFailure() {
 }
 
 function notifySuccess(matches) {
-  Notify.success(`${matches} matches found!`);
+  Notify.success(`Hooray! We found ${matches} images.`);
 }
-
-//temporary
-// getImages('cat').then(data => generateMarkup(data));
-
-// showLoadMore();

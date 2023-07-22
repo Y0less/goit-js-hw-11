@@ -1,25 +1,34 @@
 :root {
-    --main-color: #0352fc
+    --main-color: #4D5AE5;
+    --accent-color: #31D0AA;
+    --background-color: #fcfcfc;
 }
 
 body {
-    background-color: #fcfcfc;
+    background-color: var(--background-color);
 }
 
 .search-container {
+    position: fixed;
+    top: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 50px;
-    background-color: var(--main-color)
+    width: 100%;
+    background-color: var(--main-color);
+    box-shadow: 0px 1px 6px rgba(46, 47, 66, 0.08),
+        0px 1px 1px rgba(46, 47, 66, 0.16),
+        0px 2px 1px rgba(46, 47, 66, 0.08);
 }
 
 .search-form input {
     border-radius: 5px;
-    min-height: 35px;
+    min-height: 30px;
     min-width: 250px;
     border-color: transparent;
     line-height: 1.5;
+    outline: none;
 }
 
 .search-form button {
@@ -29,9 +38,17 @@ body {
     border-color: transparent;
 }
 
+.search-form button:is(:hover, :focus) {
+    color: var(--background-color);
+    background-color: var(--accent-color);
+}
+
+
 .gallery {
     justify-content: center;
     margin: 30px;
+    padding-top: 50px;
+    /* margin-top: 50px; */
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
@@ -44,14 +61,14 @@ body {
     box-shadow: 0px 1px 6px rgba(46, 47, 66, 0.08), 0px 1px 1px rgba(46, 47, 66, 0.16), 0px 2px 1px rgba(46, 47, 66, 0.08);
 }
 
-.photo-card>img {
+.photo-card img {
     width: 100%;
     height: 300px;
     object-fit: cover;
 }
 
 
-.img-container>img {
+/* .img-container>img {
     box-sizing: content-box;
     width: 400px;
     height: 70%;
@@ -62,7 +79,7 @@ body {
 .img-container {
     width: 100%;
     height: 100%;
-}
+} */
 
 .info {
     display: flex;
@@ -90,10 +107,17 @@ body {
     min-height: 30px;
     text-transform: uppercase;
     min-width: fit-content;
-    color: wheat;
-    background-color: var(--main-color)
-        /* border-color: transparent; */
+    color: var(--background-color);
+    background-color: var(--main-color);
+    border-color: transparent;
+    box-shadow: 0px 1px 6px rgba(46, 47, 66, 0.08),
+        0px 1px 1px rgba(46, 47, 66, 0.16),
+        0px 2px 1px rgba(46, 47, 66, 0.08);
+}
 
+.load-more:is(:hover, :focus) {
+    color: var(--background-color);
+    background-color: var(--accent-color);
 }
 
 .is-hidden {
