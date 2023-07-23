@@ -13,29 +13,29 @@ export const searchParams = {
 const refs = {
   searchForm: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
-  loadMore: document.querySelector('.load-more'),
+  // loadMore: document.querySelector('.load-more'),
+  observerWatchdog: document.querySelector('.observer-watchdog'),
 };
 
-// const { height: cardHeight } =
-//   refs.gallery.firstElementChild.getBoundingClientRect();
+const observerOptions = {
+  root: null,
+  rootMargin: '300px',
+  threshold: 0,
+};
 
-// window.scrollBy({
-//   top: cardHeight * 2,
-//   behavior: 'smooth',
-// });
+const perPage = 40;
+let searchQuery = '';
+let totalHits = null;
 
+const observer = new IntersectionObserver(handleObserver, observerOptions);
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
   overlayOpacity: 0.6,
 });
 
-const perPage = 40;
-let searchQuery = '';
-let totalHits = null;
-
 refs.searchForm.addEventListener('submit', handleSubmit);
-refs.loadMore.addEventListener('click', handleLoadmore);
+// refs.loadMore.addEventListener('click', handleLoadmore);
 
 function handleSubmit(evt) {
   evt.preventDefault();
@@ -43,53 +43,55 @@ function handleSubmit(evt) {
   searchQuery = '';
   searchParams.per_page = perPage;
   searchParams.page = 1;
-  hideLoadMore();
+  // hideLoadMore();
   searchQuery = evt.currentTarget.elements.searchQuery.value;
-  console.log('searchQuery :>> ', searchQuery); //hide
-
+  observer.unobserve(refs.observerWatchdog);
   getImages(searchQuery)
     .then(data => {
       totalHits = data.totalHits;
       if (!totalHits) {
         notifyFailure();
-        hideLoadMore();
+        // hideLoadMore();
         return;
       }
-      console.log(data); //hide
-      console.log('data.hits.length :>> ', data.hits.length); //hide
       notifySuccess(totalHits);
       generateMarkup(data);
-      showLoadMore();
+      // showLoadMore();
       checkCollectionEnd(data);
       lightbox.refresh();
+      if (data.totalHits > perPage * searchParams.page) {
+        observer.observe(refs.observerWatchdog);
+      }
+      if (data.totalHits <= perPage * searchParams.page) {
+        observer.unobserve(refs.observerWatchdog);
+      }
     })
     .catch(error => {
       console.log(error);
-      hideLoadMore();
+      // hideLoadMore();
     })
     .finally();
 }
 
 function handleLoadmore() {
   searchParams.page += 1;
+  if (totalHits <= perPage * (searchParams.page - 1)) {
+    return;
+  }
   getImages(searchQuery)
     .then(data => {
-      if (!data.totalHits) {
-        notifyFailure();
-        hideLoadMore();
-        return;
-      }
-      console.log(data); //hide
-      console.log('page :>> ', searchParams.page); //hide
       generateMarkup(data);
-      showLoadMore();
+      // showLoadMore();
       checkCollectionEnd(data);
       lightbox.refresh();
+      if (data.totalHits <= perPage * searchParams.page) {
+        observer.unobserve(refs.observerWatchdog);
+      }
       autoScrollUp();
     })
     .catch(error => {
       console.log(error);
-      hideLoadMore();
+      // hideLoadMore();
     })
     .finally();
 }
@@ -127,19 +129,12 @@ function generateMarkup(data = []) {
   refs.gallery.insertAdjacentHTML('beforeend', markup);
 }
 
-function showLoadMore() {
-  refs.loadMore.classList.remove('is-hidden');
-}
-function hideLoadMore() {
-  refs.loadMore.classList.add('is-hidden');
-}
-
 function checkCollectionEnd(data) {
   if (data.totalHits <= perPage * searchParams.page) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
-    hideLoadMore();
+    // hideLoadMore();
   }
 }
 
@@ -162,3 +157,18 @@ function notifyFailure() {
 function notifySuccess(matches) {
   Notify.success(`Hooray! We found ${matches} images.`);
 }
+
+function handleObserver(entries) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      handleLoadmore();
+    }
+  });
+}
+
+// function showLoadMore() {
+//   refs.loadMore.classList.remove('is-hidden');
+// }
+// function hideLoadMore() {
+//   refs.loadMore.classList.add('is-hidden');
+// }
